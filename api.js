@@ -12,3 +12,27 @@ const API_KEY = 'live_4V04id3K97xjGpG9pIZ98kz5GYLTs4l3kRAXA08wgcjR9rkuCtS2P2BdIg
     }
 }
 
+export async function favoriteDogImage(imageId) {
+    const url = "https://api.thedogapi.com/v1/favourites";
+    const dogBody = JSON.stringify({ 
+        "image_id": imageId,
+        "sub_id": "user-123" // Adjust as needed
+    });
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'x-api-key': API_KEY, 'Content-Type': 'application/json' },
+            body: dogBody
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error favoriting dog image:', error);
+        throw error; // Or handle it as needed
+    }
+}

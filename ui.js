@@ -1,5 +1,5 @@
 
-
+import { favoriteDogImage } from './api.js';
 
  export function updateUI(dogs, searchTerm = '') {
     const dogList = document.getElementById('dogList');
@@ -9,7 +9,7 @@
         if (dog.name.toLowerCase().includes(searchTerm.toLowerCase())){
         const element = document.createElement('div');
         element.classList.add('col-md-4', 'mb-3');
-      
+        
         // Bootstrap Card
         element.innerHTML = `
             <div class="card">
@@ -24,11 +24,24 @@
             showDogInfo(dog);
         });
 
+// Create Favorite button
+const favoriteBtn = document.createElement('button');
+favoriteBtn.textContent = 'Favorite';
+favoriteBtn.classList.add('favorite-btn');
+
+// Attach event listener to the Favorite button
+favoriteBtn.addEventListener('click', () => handleFavoriteClick(dog));
+
+// Append the Favorite button to the card
+const cardBody = element.querySelector('.card-body');
+cardBody.appendChild(favoriteBtn);
+       
+       
         dogList.appendChild(element);
     }
     });
-}
 
+ }
 
 
 function showDogInfo(dog) {
@@ -59,4 +72,14 @@ function showDogInfo(dog) {
     // Show the modal
     $('#dogInfoModal').modal('show');
    
+}
+function handleFavoriteClick(dog) {
+    favoriteDogImage(dog.image.id).then(result => {
+        console.log('Favorite clicked for', result);
+
+        // Save to local storage
+        const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        favorites.push({ imageId: dog.image.id, name: dog.name });
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+    }).catch(error => console.error('Error favoriting dog', error));
 }
