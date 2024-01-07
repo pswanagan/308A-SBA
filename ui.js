@@ -1,6 +1,7 @@
 
 
-function updateUI(dogs) {
+
+ export function updateUI(dogs) {
     const dogList = document.getElementById('dogList');
     dogList.innerHTML = '';
 
@@ -55,4 +56,5 @@ function showDogInfo(dog) {
 
     // Show the modal
     $('#dogInfoModal').modal('show');
+   
 }

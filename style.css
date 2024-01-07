@@ -1,0 +1,14 @@
+body{
+    background-color:burlywood;
+}
+
+* Style for the dog cards */
+.card {
+    height: 100%; /* Optional: Adjust if you want fixed height cards */
+}
+
+.card-img-top {
+    width: 100%; /* Full width */
+    height: 250px; /* Fixed height */
+    object-fit: cover; /* Ensures the image covers the area without stretching */
+}
