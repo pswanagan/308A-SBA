@@ -1,14 +1,15 @@
 
 
 
- export function updateUI(dogs) {
+ export function updateUI(dogs, searchTerm = '') {
     const dogList = document.getElementById('dogList');
     dogList.innerHTML = '';
 
     dogs.forEach(dog => {
+        if (dog.name.toLowerCase().includes(searchTerm.toLowerCase())){
         const element = document.createElement('div');
         element.classList.add('col-md-4', 'mb-3');
-       
+      
         // Bootstrap Card
         element.innerHTML = `
             <div class="card">
@@ -24,6 +25,7 @@
         });
 
         dogList.appendChild(element);
+    }
     });
 }
 
