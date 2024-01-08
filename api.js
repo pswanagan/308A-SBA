@@ -16,7 +16,7 @@ export async function favoriteDogImage(imageId) {
     const url = "https://api.thedogapi.com/v1/favourites";
     const dogBody = JSON.stringify({ 
         "image_id": imageId,
-        "sub_id": "user-123" // Adjust as needed
+        "sub_id": "default" // Adjust as needed
     });
 
     try {
@@ -35,4 +35,36 @@ export async function favoriteDogImage(imageId) {
         console.error('Error favoriting dog image:', error);
         throw error; // Or handle it as needed
     }
+}
+export async function fetchFavorites() {
+    const url = "https://api.thedogapi.com/v1/favourites";
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: { 'x-api-key': API_KEY }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Error getting favorite dogs: ', error);
+        throw error;
+    }
+}
+
+export async function deleteFavorite(favoriteId) {
+    const url = `https://api.thedogapi.com/v1/favourites/${favoriteId}`;
+    const response = await fetch(url, {
+        method: 'DELETE',
+        headers: { 'x-api-key': API_KEY }
+    });
+
+    if (!response.ok) {
+        throw new Error(`Error: ${response.status} ${response.statusText}`);
+    }
+
+    return await response.json();
 }

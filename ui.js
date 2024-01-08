@@ -1,5 +1,5 @@
 
-import { favoriteDogImage } from './api.js';
+import { favoriteDogImage, deleteFavorite } from './api.js';
 
  export function updateUI(dogs, searchTerm = '') {
     const dogList = document.getElementById('dogList');
@@ -30,7 +30,7 @@ favoriteBtn.textContent = 'Favorite';
 favoriteBtn.classList.add('favorite-btn');
 
 // Attach event listener to the Favorite button
-favoriteBtn.addEventListener('click', () => handleFavoriteClick(dog));
+favoriteBtn.addEventListener('click', (event) => handleFavoriteClick(event,dog));
 
 // Append the Favorite button to the card
 const cardBody = element.querySelector('.card-body');
@@ -73,13 +73,43 @@ function showDogInfo(dog) {
     $('#dogInfoModal').modal('show');
    
 }
-function handleFavoriteClick(dog) {
-    favoriteDogImage(dog.image.id).then(result => {
-        console.log('Favorite clicked for', result);
+function handleFavoriteClick(event, dog) {
+    event.stopPropagation();
 
-        // Save to local storage
-        const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-        favorites.push({ imageId: dog.image.id, name: dog.name });
-        localStorage.setItem('favorites', JSON.stringify(favorites));
-    }).catch(error => console.error('Error favoriting dog', error));
+    const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+    const existingFavorite = favorites.find(f => f.imageId === dog.image.id);
+
+    if (existingFavorite) {
+        // Dog is already favorited, delete it from API and local storage
+        deleteFavorite(existingFavorite.id).then(() => {
+            const newFavorites = favorites.filter(f => f.imageId !== dog.image.id);
+            localStorage.setItem('favorites', JSON.stringify(newFavorites));
+            console.log('Favorite removed for', dog.name);
+        }).catch(error => console.error('Error removing favorite dog', error));
+    } else {
+        // Dog is not favorited, add it to API and local storage
+        favoriteDogImage(dog.image.id).then(result => {
+            console.log('Favorite clicked for', result);
+            favorites.push({ imageId: dog.image.id, name: dog.name, id: result.id });
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+        }).catch(error => console.error('Error favoriting dog', error));
+    }
+}
+
+export function displayFavoritesModal(favorites) {
+    const modalTitle = document.getElementById('dogInfoModalLabel');
+    const modalBody = document.querySelector('#dogInfoModal .modal-body');
+
+    // Set modal title
+    modalTitle.textContent = 'Favorite Breeds';
+
+    // Populate modal body with favorite dogs
+    modalBody.innerHTML = '<ul>';
+    favorites.forEach(fav => {
+        modalBody.innerHTML += `<li>${fav.name}</li>`; // Assuming fav object has a 'name' property
+    });
+    modalBody.innerHTML += '</ul>';
+
+    // Show the modal
+    $('#dogInfoModal').modal('show');
 }
