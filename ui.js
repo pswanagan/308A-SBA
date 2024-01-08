@@ -1,5 +1,6 @@
 
-import { favoriteDogImage, deleteFavorite } from './api.js';
+import { favoriteDogImage, deleteFavorite, fetchFavorites, getDogs } from './api.js';
+
 
  export function updateUI(dogs, searchTerm = '') {
     const dogList = document.getElementById('dogList');
@@ -73,43 +74,37 @@ function showDogInfo(dog) {
     $('#dogInfoModal').modal('show');
    
 }
-function handleFavoriteClick(event, dog) {
+async function handleFavoriteClick(event, dog) {
     event.stopPropagation();
 
-    const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-    const existingFavorite = favorites.find(f => f.imageId === dog.image.id);
+    const apiFavorites = await fetchFavorites();
+    const existingFavorite = apiFavorites.find(f => f.image_id === dog.image.id);
 
     if (existingFavorite) {
-        // Dog is already favorited, delete it from API and local storage
-        deleteFavorite(existingFavorite.id).then(() => {
-            const newFavorites = favorites.filter(f => f.imageId !== dog.image.id);
-            localStorage.setItem('favorites', JSON.stringify(newFavorites));
-            console.log('Favorite removed for', dog.name);
-        }).catch(error => console.error('Error removing favorite dog', error));
+        await deleteFavorite(existingFavorite.id);
+        console.log('Favorite removed for', dog.name);
     } else {
-        // Dog is not favorited, add it to API and local storage
-        favoriteDogImage(dog.image.id).then(result => {
-            console.log('Favorite clicked for', result);
-            favorites.push({ imageId: dog.image.id, name: dog.name, id: result.id });
-            localStorage.setItem('favorites', JSON.stringify(favorites));
-        }).catch(error => console.error('Error favoriting dog', error));
+        const result = await favoriteDogImage(dog.image.id);
+        console.log('Favorite clicked for', result);
     }
 }
 
-export function displayFavoritesModal(favorites) {
+export async function displayFavoritesModal() {
+    const apiFavorites = await fetchFavorites();
+    const allDogs = await getDogs(); // Assuming getDogs() fetches all dogs' data
+
     const modalTitle = document.getElementById('dogInfoModalLabel');
     const modalBody = document.querySelector('#dogInfoModal .modal-body');
 
-    // Set modal title
     modalTitle.textContent = 'Favorite Breeds';
-
-    // Populate modal body with favorite dogs
     modalBody.innerHTML = '<ul>';
-    favorites.forEach(fav => {
-        modalBody.innerHTML += `<li>${fav.name}</li>`; // Assuming fav object has a 'name' property
-    });
-    modalBody.innerHTML += '</ul>';
 
-    // Show the modal
+    apiFavorites.forEach(fav => {
+        const dog = allDogs.find(d => d.image.id === fav.image_id);
+        const dogName = dog ? dog.name : 'Unknown';
+        modalBody.innerHTML += `<li>${dogName}</li>`;
+    });
+
+    modalBody.innerHTML += '</ul>';
     $('#dogInfoModal').modal('show');
 }
