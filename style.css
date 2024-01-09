@@ -1,14 +1,38 @@
 body{
     background-color:burlywood;
+    border-style: inset;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #582817; /* darker shade of blue for contrast */
+}
+
+
+li {
+  color: #582817;
+}
+
+button {
+    background-color: #AA5042; /* light salmon color */
+    color: white; /* white text on colored buttons */
+    border: 2px solid #AA5042; /* border color same as button */
+    border-radius: 5px;
 }
 
 * Style for the dog cards */
 .card {
     height: 100%; /* Optional: Adjust if you want fixed height cards */
+   
+
 }
 
 .card-img-top {
     width: 100%; /* Full width */
     height: 250px; /* Fixed height */
     object-fit: cover; /* Ensures the image covers the area without stretching */
+}
+
+.header {
+    text-align: center;
+    
 }
